@@ -50,6 +50,8 @@ const multiThreaded = require("./lib/multi-threader");
     else console.log("ninguna coincide");
   };
   console.time("total");
+  if(palabrasPotenciales.length == 1) finalizado(palabrasPotenciales[0].map(palabra =>[palabra]))
+  else
   multiThreaded(palabrasPatrones, palabrasPotenciales, {
     finalizado,
     progreso: barraProgreso.avanzar,
