@@ -11,8 +11,11 @@ module.exports = function () {
 
   this.cargar = ({ diccionario, sacarTildes, saveIndex, disableCache }) => {
     if (diccionario || diccionario === 0) {
-      if (isNaN(diccionario)) this.diccionarioCargado = diccionario;
-      else this.diccionarioCargado = this.disponibles[diccionario];
+      
+      this.diccionarioCargado = isNaN(diccionario)
+        ? diccionario
+        : this.disponibles[diccionario];
+
       if (
         !disableCache &&
         this.archivos.includes(this.diccionarioCargado + ".cache")
@@ -26,12 +29,11 @@ module.exports = function () {
         );
       } else {
         console.log("sin cache");
-        const dicFile = fs.readFileSync(`${__dirname}/${this.diccionarioCargado}.txt`)
+        const dicFile = fs
+          .readFileSync(`${__dirname}/${this.diccionarioCargado}.txt`)
           .toString();
         const EOL = /\r/.test(dicFile) ? "\r\n" : "\n";
-        this.palabras = 
-        dicFile
-          .split(EOL);
+        this.palabras = dicFile.split(EOL);
 
         this.palabras = [
           ...new Set(
@@ -49,12 +51,14 @@ module.exports = function () {
           ),
         ];
         this.palabras.forEach((palabra) => {
-          let largoPalabra = palabra.length;
+          const largoPalabra = palabra.length;
+          const caracteresPalabra = new Set(palabra).size;
           if (!this.index[largoPalabra]) this.index[largoPalabra] = [];
-          this.index[largoPalabra].push(palabra);
+          if (!this.index[largoPalabra][caracteresPalabra])
+            this.index[largoPalabra][caracteresPalabra] = [];
+          this.index[largoPalabra][caracteresPalabra].push(palabra);
         });
         if (saveIndex)
-          // this.diccionarioCargado
           fs.writeFileSync(
             `${__dirname}\\${this.diccionarioCargado}.cache`,
             JSON.stringify(({ index, palabras } = this))
@@ -64,5 +68,4 @@ module.exports = function () {
 
     return this;
   };
-  // this.cargar({diccionario, sacarTildes, saveIndex, disableCache});
 };
